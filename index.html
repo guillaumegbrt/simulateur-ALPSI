@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur QCM d'entraînement ALPSI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #50E3C2;
+            --background-color: #F0F4F8;
+            --card-background: #FFFFFF;
+            --text-color: #333333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --success-color: #388E3C;
+            --error-color: #D32F2F;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background-color: var(--card-background);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        h1 {
+            color: var(--primary-color);
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        h2 { color: var(--text-color); font-size: 1.6em; }
+        .intro {
+            font-size: 1em;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: #555;
+        }
+        #quiz-form, #results { display: none; }
+
+        /* Setup panel */
+        .setup-panel {
+            background: #F8FBFF;
+            border: 1px solid #D0E4F7;
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        .setup-panel h3 {
+            color: var(--primary-color);
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .input-group label { font-weight: 600; color: #555; }
+        #num-questions {
+            width: 90px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1em;
+            font-family: 'Poppins', sans-serif;
+        }
+        #num-questions:focus { outline: none; border-color: var(--primary-color); }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        .module-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85em;
+        }
+        .module-checkbox:hover { border-color: var(--primary-color); background: #EBF4FF; }
+        .module-checkbox input[type="checkbox"] { accent-color: var(--primary-color); width: 16px; height: 16px; }
+        .module-checkbox.checked { border-color: var(--primary-color); background: #EBF4FF; font-weight: 600; }
+        .select-all-btn {
+            font-size: 0.8em;
+            padding: 5px 12px;
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .select-all-btn:hover { background: var(--primary-color); color: white; }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-weight: 600;
+        }
+        .btn:hover { background-color: #3A72C1; transform: translateY(-2px); }
+        .btn:disabled { background-color: #aaa; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            background-color: #6c757d;
+            margin-left: 10px;
+        }
+        .btn-secondary:hover { background-color: #545b62; }
+
+        /* Progress bar */
+        .progress-bar-container {
+            background: #E0E8F0;
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        .progress-label {
+            text-align: right;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: -15px;
+            margin-bottom: 15px;
+        }
+
+        /* Question cards */
+        .question-card {
+            background-color: #F8FBFF;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #E0EAF4;
+        }
+        .question-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1em;
+            line-height: 1.5;
+            color: #222;
+        }
+        .module-badge {
+            display: inline-block;
+            font-size: 0.7em;
+            padding: 2px 8px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .options-list { list-style: none; padding: 0; margin: 0; }
+        .options-list li { margin-bottom: 8px; }
+        .option-label {
+            display: block;
+            background-color: #FFFFFF;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #E0E8F0;
+            font-size: 0.95em;
+        }
+        .option-label:hover { background-color: #EBF4FF; border-color: var(--primary-color); }
+        input[type="radio"] { display: none; }
+        input[type="radio"]:checked + .option-label {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Results */
+        .score-box {
+            padding: 25px;
+            border-radius: 14px;
+            margin: 20px 0;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        .score-box.success { background: #E8F5E9; border: 2px solid #81C784; color: var(--success-color); }
+        .score-box.failure { background: #FDECEA; border: 2px solid #E57373; color: var(--error-color); }
+        .score-number { font-size: 1.8em; display: block; margin-top: 5px; }
+        .score-percent { font-size: 1.2em; }
+
+        .wrong-answer-card {
+            background-color: #FDECEA;
+            padding: 18px 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: left;
+            border-left: 5px solid #E57373;
+        }
+        .wrong-answer-card p { margin: 5px 0; font-size: 0.9em; line-height: 1.5; }
+        .wrong { color: #D32F2F; font-weight: bold; }
+        .correct { color: #388E3C; font-weight: bold; }
+        .wrong-module-badge {
+            display: inline-block;
+            font-size: 0.7em;
+            padding: 1px 7px;
+            background: #E57373;
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 6px;
+        }
+
+        .results-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .threshold-note { font-size: 0.85em; color: #777; margin-top: -10px; margin-bottom: 15px; }
+
+        /* Unanswered warning */
+        .unanswered-warning {
+            background: #FFF3CD;
+            border: 1px solid #FFCA28;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #856404;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.5em; }
+            .modules-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Simulateur QCM d'entraînement ALPSI</h1>
+    <p class="intro">Testez vos connaissances sur l'agent lié avec ce quiz interactif. Sélectionnez les modules et choisissez le nombre de questions. Il faut obtenir au moins <strong>80%</strong> de bonnes réponses pour réussir.</p>
+
+    <div id="setup">
+        <div class="setup-panel">
+            <h3>📚 Modules à inclure</h3>
+            <button class="select-all-btn" onclick="toggleAllModules()">Tout sélectionner / Tout désélectionner</button>
+            <div class="modules-grid" id="modules-grid"></div>
+        </div>
+
+        <div class="setup-panel">
+            <h3>🎯 Nombre de questions</h3>
+            <div class="input-group">
+                <label for="num-questions">Questions :</label>
+                <input type="number" id="num-questions" min="1" max="856" value="120">
+                <span id="max-info" style="font-size:0.85em; color:#888;"></span>
+            </div>
+        </div>
+
+        <button class="btn" onclick="startQuiz()">Commencer le QCM</button>
+    </div>
+
+    <form id="quiz-form">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+        </div>
+        <div class="progress-label" id="progress-label"></div>
+        <div id="questions"></div>
+        <div class="unanswered-warning" id="unanswered-warning">
+            ⚠️ <span id="unanswered-count"></span> question(s) sans réponse. Voulez-vous quand même soumettre ?
+        </div>
+        <button type="button" class="btn" onclick="submitQuiz()">Soumettre le QCM</button>
+        <button type="button" class="btn btn-secondary" onclick="restartQuiz()">Annuler</button>
+    </form>
+
+    <div id="results">
+        <div class="results-header">
+            <h2>Résultats</h2>
+        </div>
+        <div id="score-box" class="score-box">
+            <span class="score-number" id="score-display"></span>
+            <span class="score-percent" id="pct-display"></span>
+        </div>
+        <p class="threshold-note" id="threshold-msg"></p>
+
+        <div id="wrong-section">
+            <h3 style="text-align:left; margin-top:25px;">❌ Réponses incorrectes</h3>
+            <div id="wrong-answers"></div>
+        </div>
+
+        <div style="margin-top:25px;">
+            <button class="btn" onclick="restartQuiz()">Recommencer un nouveau quiz</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Module definitions
+const MODULE_LABELS = {
+    module1: "Module 1",
+    module2: "Module 2",
+    module3: "Module 3",
+    module4_1: "Module 4 – Partie 1",
+    module4_2: "Module 4 – Partie 2",
+    module4_3: "Module 4 – Partie 3",
+    module5: "Module 5",
+    module6: "Module 6",
+    module7: "Module 7",
+    module8: "Module 8"
+};
+
+const MODULE_KEYS = Object.keys(MODULE_LABELS);
+const PASS_THRESHOLD = 0.80;
+
+let allQuestions = {}; // loaded from JSON
+let selectedQuestions = [];
+let userAnswers = [];
+let checkedModules = new Set(MODULE_KEYS);
+
+// Build module checkboxes
+function buildModuleCheckboxes() {
+    const grid = document.getElementById('modules-grid');
+    MODULE_KEYS.forEach(key => {
+        const count = allQuestions[key] ? allQuestions[key].length : 0;
+        const label = document.createElement('label');
+        label.className = 'module-checkbox checked';
+        label.id = 'lbl-' + key;
+        label.innerHTML = `
+            <input type="checkbox" id="chk-${key}" checked onchange="toggleModule('${key}')">
+            ${MODULE_LABELS[key]} <span style="color:#888;font-size:0.9em">(${count})</span>
+        `;
+        grid.appendChild(label);
+    });
+    updateMaxInfo();
+}
+
+function toggleModule(key) {
+    const chk = document.getElementById('chk-' + key);
+    const lbl = document.getElementById('lbl-' + key);
+    if (chk.checked) {
+        checkedModules.add(key);
+        lbl.classList.add('checked');
+    } else {
+        checkedModules.delete(key);
+        lbl.classList.remove('checked');
+    }
+    updateMaxInfo();
+}
+
+let allChecked = true;
+function toggleAllModules() {
+    allChecked = !allChecked;
+    MODULE_KEYS.forEach(key => {
+        const chk = document.getElementById('chk-' + key);
+        const lbl = document.getElementById('lbl-' + key);
+        chk.checked = allChecked;
+        if (allChecked) {
+            checkedModules.add(key);
+            lbl.classList.add('checked');
+        } else {
+            checkedModules.delete(key);
+            lbl.classList.remove('checked');
+        }
+    });
+    updateMaxInfo();
+}
+
+function updateMaxInfo() {
+    let total = 0;
+    checkedModules.forEach(k => { total += allQuestions[k] ? allQuestions[k].length : 0; });
+    document.getElementById('max-info').textContent = `(max disponible : ${total} questions)`;
+    document.getElementById('num-questions').max = total;
+}
+
+// Shuffle array
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+async function loadQuestions() {
+    try {
+        const response = await fetch('questions_alpsi.json');
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        allQuestions = await response.json();
+        buildModuleCheckboxes();
+    } catch (e) {
+        document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:sans-serif;"><h2 style="color:#c00">Erreur de chargement</h2><p>Impossible de charger <strong>questions_alpsi.json</strong>.<br>Vérifiez que le fichier est dans le même dossier que cette page.</p></div>';
+    }
+}
+
+loadQuestions();
+
+function startQuiz() {
+    if (checkedModules.size === 0) {
+        alert('Veuillez sélectionner au moins un module.');
+        return;
+    }
+
+    const numQ = parseInt(document.getElementById('num-questions').value);
+
+    // Collect pool with module tags, equally distributed
+    let pool = [];
+    const activeModules = [...checkedModules].filter(k => allQuestions[k] && allQuestions[k].length > 0);
+
+    if (activeModules.length === 0) {
+        alert('Aucune question disponible pour les modules sélectionnés.');
+        return;
+    }
+
+    const totalAvailable = activeModules.reduce((s, k) => s + allQuestions[k].length, 0);
+
+    if (numQ > totalAvailable || numQ <= 0 || isNaN(numQ)) {
+        alert(`Veuillez entrer un nombre entre 1 et ${totalAvailable}.`);
+        return;
+    }
+
+    // Equal distribution across modules
+    // First shuffle each module's questions
+    const shuffledModules = {};
+    activeModules.forEach(k => {
+        shuffledModules[k] = shuffle(allQuestions[k]).map(q => ({...q, _module: k}));
+    });
+
+    // Round-robin distribution
+    const perModule = Math.floor(numQ / activeModules.length);
+    let remainder = numQ % activeModules.length;
+
+    selectedQuestions = [];
+    activeModules.forEach((k, i) => {
+        const take = perModule + (i < remainder ? 1 : 0);
+        selectedQuestions.push(...shuffledModules[k].slice(0, take));
+    });
+
+    // Final shuffle of selected questions
+    selectedQuestions = shuffle(selectedQuestions);
+
+    // Render questions
+    const container = document.getElementById('questions');
+    container.innerHTML = '';
+    userAnswers = new Array(selectedQuestions.length).fill(null);
+
+    selectedQuestions.forEach((q, index) => {
+        const shuffledOptions = shuffle(q.options);
+
+        const qDiv = document.createElement('div');
+        qDiv.classList.add('question-card');
+        qDiv.innerHTML = `
+            <div class="module-badge">${MODULE_LABELS[q._module] || q._module}</div>
+            <h3>${index + 1}. ${q.question}</h3>
+            <ul class="options-list">
+                ${shuffledOptions.map((opt, i) => `
+                    <li>
+                        <input type="radio" id="q${index}-o${i}" name="q${index}" value="${opt.replace(/"/g, '&quot;')}" onchange="recordAnswer(${index}, this.value)">
+                        <label for="q${index}-o${i}" class="option-label">${opt}</label>
+                    </li>
+                `).join('')}
+            </ul>`;
+        container.appendChild(qDiv);
+    });
+
+    // Progress
+    updateProgress();
+
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('quiz-form').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('unanswered-warning').style.display = 'none';
+    window.scrollTo(0, 0);
+}
+
+function recordAnswer(index, value) {
+    userAnswers[index] = value;
+    updateProgress();
+}
+
+function updateProgress() {
+    const answered = userAnswers.filter(a => a !== null).length;
+    const total = selectedQuestions.length;
+    const pct = total > 0 ? (answered / total * 100) : 0;
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = `${answered} / ${total} réponses`;
+}
+
+function submitQuiz() {
+    const unanswered = userAnswers.filter(a => a === null).length;
+
+    if (unanswered > 0) {
+        const warning = document.getElementById('unanswered-warning');
+        warning.style.display = 'block';
+        document.getElementById('unanswered-count').textContent = unanswered;
+        // Ask confirmation
+        if (!confirm(`Attention : ${unanswered} question(s) sans réponse. Soumettre quand même ?`)) return;
+    }
+
+    let score = 0;
+    selectedQuestions.forEach((q, i) => {
+        if (userAnswers[i] === q.correct) score++;
+    });
+
+    const total = selectedQuestions.length;
+    const pct = score / total;
+    const passed = pct >= PASS_THRESHOLD;
+
+    // Score display
+    const scoreBox = document.getElementById('score-box');
+    scoreBox.className = 'score-box ' + (passed ? 'success' : 'failure');
+    document.getElementById('score-display').textContent = `${score} / ${total}`;
+    document.getElementById('pct-display').textContent = `${(pct * 100).toFixed(1)}%`;
+
+    const msg = document.getElementById('threshold-msg');
+    if (passed) {
+        msg.textContent = `✅ Félicitations ! Vous avez dépassé le seuil de 80% requis.`;
+        msg.style.color = '#388E3C';
+    } else {
+        msg.textContent = `❌ Score insuffisant. Il faut obtenir au moins 80% (${Math.ceil(total * 0.8)} bonnes réponses sur ${total}).`;
+        msg.style.color = '#D32F2F';
+    }
+
+    // Wrong answers
+    const wrongContainer = document.getElementById('wrong-answers');
+    wrongContainer.innerHTML = '';
+    const wrongCount = selectedQuestions.filter((q, i) => userAnswers[i] !== q.correct).length;
+
+    if (wrongCount === 0) {
+        wrongContainer.innerHTML = '<p style="color:#388E3C;font-weight:600;">🎉 Aucune erreur ! Score parfait !</p>';
+    } else {
+        selectedQuestions.forEach((q, i) => {
+            if (userAnswers[i] !== q.correct) {
+                const div = document.createElement('div');
+                div.className = 'wrong-answer-card';
+                div.innerHTML = `
+                    <div class="wrong-module-badge">${MODULE_LABELS[q._module] || q._module}</div>
+                    <p><strong>Question :</strong> ${q.question}</p>
+                    <p><strong>Votre réponse :</strong> <span class="wrong">${userAnswers[i] || 'Sans réponse'}</span></p>
+                    <p><strong>Réponse correcte :</strong> <span class="correct">${q.correct}</span></p>
+                `;
+                wrongContainer.appendChild(div);
+            }
+        });
+    }
+
+    document.getElementById('quiz-form').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+    window.scrollTo(0, 0);
+}
+
+function restartQuiz() {
+    selectedQuestions = [];
+    userAnswers = [];
+    document.getElementById('quiz-form').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('setup').style.display = 'block';
+    document.getElementById('questions').innerHTML = '';
+    document.getElementById('unanswered-warning').style.display = 'none';
+    window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
