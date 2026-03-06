@@ -477,7 +477,6 @@ function startQuiz() {
         const qDiv = document.createElement('div');
         qDiv.classList.add('question-card');
         qDiv.innerHTML = `
-            <div class="module-badge">${MODULE_LABELS[q._module] || q._module}</div>
             <h3>${index + 1}. ${q.question}</h3>
             <ul class="options-list">
                 ${shuffledOptions.map((opt, i) => `
