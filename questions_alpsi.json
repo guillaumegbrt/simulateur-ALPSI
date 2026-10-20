@@ -683,6 +683,24 @@
         "Un système organisé de négociation"
       ],
       "correct": "Une société de gestion de portefeuille"
+    },
+    {
+      "question": "Quels standards internationaux permettent d'identifier les acteurs et les instruments financiers ?",
+      "options": [
+        "Le code IBAN et le LEI",
+        "Le LEI et le code SWIFT",
+        "Le code ISIN et le LEI"
+      ],
+      "correct": "Le code ISIN et le LEI"
+    },
+    {
+      "question": "L'agrément des entreprises d'investissement est donné par :",
+      "options": [
+        "L'Autorité de contrôle prudentiel et de résolution (ACPR)",
+        "Le Ministère de l'Économie et des Finances",
+        "L'Autorité des marchés financiers (AMF)"
+      ],
+      "correct": "L'Autorité de contrôle prudentiel et de résolution (ACPR)"
     }
   ],
   "module2": [
@@ -2496,6 +2514,24 @@
         "3 ans"
       ],
       "correct": "2 ans"
+    },
+    {
+      "question": "Dans le cadre des obligations d'information aux clients non professionnels, quels éléments relatifs aux coûts doivent être communiqués au client ?",
+      "options": [
+        "Les investissements passés réalisés par le prestataire",
+        "Les modalités de paiement éventuelles",
+        "Les coûts prélevés au cours des 3 dernières années"
+      ],
+      "correct": "Les modalités de paiement éventuelles"
+    },
+    {
+      "question": "Que doit fournir le prestataire en plus des informations sur les coûts et frais liés à un investissement ?",
+      "options": [
+        "Un graphique comparant les performances passées du fonds avec celles du marché",
+        "Une estimation des frais potentiels en fonction du montant de l'investissement",
+        "Une illustration montrant l'effet cumulatif des coûts sur le rendement"
+      ],
+      "correct": "Une illustration montrant l'effet cumulatif des coûts sur le rendement"
     }
   ],
   "module4_1": [
@@ -3596,6 +3632,15 @@
         "Un taux interbancaire calculé par la Banque Centrale Européenne"
       ],
       "correct": "Un taux interbancaire calculé par la Banque Centrale Européenne"
+    },
+    {
+      "question": "Dans le cadre d'une augmentation de capital en numéraire, quelle est la caractéristique du prix de souscription des actions nouvelles ?",
+      "options": [
+        "Il est proche du cours de bourse néanmoins inférieur à celui-ci",
+        "Il est égal à la valeur nominale",
+        "Il est égal au cours de bourse"
+      ],
+      "correct": "Il est proche du cours de bourse néanmoins inférieur à celui-ci"
     }
   ],
   "module4_2": [
@@ -4327,6 +4372,24 @@
         "Peut se faire à tout moment ou seulement à des époques déterminées appelées périodes de conversion"
       ],
       "correct": "Peut se faire à tout moment ou seulement à des époques déterminées appelées périodes de conversion"
+    },
+    {
+      "question": "Comment les dividendes, coupons et autres rémunérations reçus par un OPC impactent-ils sa valeur liquidative (VL) ?",
+      "options": [
+        "Ils n'ont aucun effet sur la VL",
+        "Ils entraînent automatiquement une baisse de la VL",
+        "Ils font augmenter la VL"
+      ],
+      "correct": "Ils font augmenter la VL"
+    },
+    {
+      "question": "Les Exchange Traded Funds (ETF) sont un exemple spécifique d'instruments de gestion collective. Leur spécificité est :",
+      "options": [
+        "Qu'ils sont investis exclusivement en produits dérivés",
+        "Qu'ils sont négociés en bourse et font l'objet d'une publication régulière de leurs inventaires de portefeuille",
+        "Qu'ils sont uniquement libellés en dollar"
+      ],
+      "correct": "Qu'ils sont négociés en bourse et font l'objet d'une publication régulière de leurs inventaires de portefeuille"
     }
   ],
   "module4_3": [
